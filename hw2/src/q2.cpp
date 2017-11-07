@@ -50,10 +50,10 @@ public:
         remain_peg = 32;
         for (int x = 0; x < 10; x++) {
             for (int y = 0; y < 10; y++) {
-                char peg = ' '; // if the location is out of the board, let it be ' '
+                bool peg ;
                 if (((abs(x - 4) < 2 && abs(y - 4) < 4) || (abs(y - 4) < 2 && abs(x - 4) < 4)) && (y != 4 || x != 4)){
-                    peg = 'x'; // if the location is on the board but not in the center, there should be a peg
-                } else peg = 'o'; // the center of the board shoube be empty
+                    peg = true; // if the location is on the board but not in the center, there should be a peg
+                } else peg = false; // the center of the board and out of board shoube be empty
             board[x][y] = peg;
             }
         }
@@ -61,16 +61,16 @@ public:
 
 
     bool solve(Vector<Move> &steps) {
-        if (remain_peg == 1 && board[4][4] == 'x') { // reach the goal
+        if (remain_peg == 1 && board[4][4]) { // reach the goal
             return true;
         }
         //cout << "check point" << endl;
         for (int x = 1; x < 9; x++) {
             for (int y = 1; y < 9; y++) {
-                if (board[x][y] == 'o') { // find out the available jump to location
+                if (! board[x][y]) { // find out the available jump to location
                     if (x < 8) {
                         //cout << remain_peg << ", 1:" << x << y << endl;
-                        if (board[x + 2][y] == 'x' && board[x + 1][y] == 'x') {
+                        if (board[x + 2][y] && board[x + 1][y]) {
                             //cout << 1;
                             steps += Move(x + 2, y, x, y);
                             Move move(x + 2, y, x, y);
@@ -82,7 +82,7 @@ public:
                     }
                     if (x > 1) {
                         //cout << remain_peg << ", 2:" << x << y << endl;
-                        if (board[x - 2][y] == 'x' && board[x - 1][y] == 'x') {
+                        if (board[x - 2][y] && board[x - 1][y]) {
                             //cout << 2;
                             steps += Move(x - 2, y, x, y);
                             Move move(x - 2, y, x, y);
@@ -94,7 +94,7 @@ public:
                     }
                     if (y > 1) {
                         //cout << remain_peg << ", 3:" << x << y << endl;
-                        if (board[x][y - 2] == 'x' && board[x][y - 1] == 'x') {
+                        if (board[x][y - 2] && board[x][y - 1]) {
                             //cout << 3;
                             steps += Move(x, y - 2, x, y);
                             Move move(x, y - 2, x, y);
@@ -106,7 +106,7 @@ public:
                     }
                     if (y < 8) {
                         //cout << remain_peg << ", 4:" << x << y << endl;
-                        if (board[x][y + 2] == 'x' && board[x][y + 1] == 'x') {
+                        if (board[x][y + 2] && board[x][y + 1]) {
                             //cout << 4;
                             steps += Move(x, y + 2, x, y);
                             Move move(x, y + 2, x, y);
@@ -125,26 +125,31 @@ public:
 
     void do_move(Move & move) { // apply moving in board
         remain_peg--;
-        board[move.x0][move.y0] = 'o';
-        board[(move.x0 + move.x1) / 2][(move.y0 + move.y1) / 2] = 'o';
-        board[move.x1][move.y1] = 'x';
+        board[move.x0][move.y0] = false;
+        board[(move.x0 + move.x1) / 2][(move.y0 + move.y1) / 2] = false;
+        board[move.x1][move.y1] = true;
         return;
     }
 
 
     void revoke(Move & move) { //revoke moving in board
         remain_peg++;
-        board[move.x0][move.y0] = 'x';
-        board[(move.x0 + move.x1) / 2][(move.y0 + move.y1) / 2] = 'x';
-        board[move.x1][move.y1] = 'o';
+        board[move.x0][move.y0] = true;
+        board[(move.x0 + move.x1) / 2][(move.y0 + move.y1) / 2] = true;
+        board[move.x1][move.y1] = false;
         return;
     }
 
 
     void displayBoard() {
-       for (int y = 1; y < 8; y++) {
-          for (int x = 1; x < 8; x++) {
-             cout << ' ' << board[x][y];
+       for (int y = 0; y < 10; y++) {
+          for (int x = 0; x < 10; x++) {
+             cout << ' ';
+             if (board[x][y]) {
+                 cout << 'x';
+             } else {
+                 cout << 'o';
+             }
           }
           cout << endl;
        }
