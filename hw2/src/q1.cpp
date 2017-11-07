@@ -1,6 +1,10 @@
 /*
- * This program is used to test the labelgen class.
- */
+* File: TestLabelGenerator.cpp
+* ----------------------------
+* This program tests the labelgen abstraction by using it to generate
+* a sequence of labels.
+*/
+
 #include <iostream>
 #include "labelgen.h"
 using namespace std;
