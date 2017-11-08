@@ -2,3 +2,5 @@
 /build-*64bit-Debug
 
 /empty-project
+
+*.pro.user
