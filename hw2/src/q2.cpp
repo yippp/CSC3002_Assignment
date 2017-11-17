@@ -51,11 +51,11 @@ class peg_solitaire {
 public:
 
     void initial() { // initialize the board
-        board.resize(10, 10); //the board need 4 more columns and rows for convient judgement
+        //board.resize(9, 9); //the board need 4 more columns and rows for convient judgement
         remain_peg = 32;
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 10; y++) {
-                if (((abs(x - 4) < 2 && abs(y - 4) < 4) || (abs(y - 4) < 2 && abs(x - 4) < 4)) && (y != 4 || x != 4)){
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                if ((abs(x - 4) < 2 && abs(y - 4) < 4) || (abs(y - 4) < 2 && abs(x - 4) < 4)){
                     board[x][y] = 'x'; // if the location is on the board but not in the center, there should be a peg
                 } else {  // if the location is out of the board, let it be ' '
                     board[x][y] = ' ';
@@ -197,9 +197,9 @@ public:
     }
 
 
-    void displayBoard() {
-       for (int y = 0; y < 10; y++) {
-          for (int x = 0; x < 10; x++) {
+    void display_board() {
+       for (int y = 0; y < 8; y++) {
+          for (int x = 0; x < 8; x++) {
              cout << board[x][y] << " ";
           }
           cout << endl;
@@ -209,7 +209,7 @@ public:
 
 
 private:
-    char board[10][10]; // storage the infomation of the board
+    char board[9][9]; // storage the infomation of the board
     int remain_peg; // storage the number of pegs remained
 };
 
@@ -217,7 +217,7 @@ private:
 int q2(){
     peg_solitaire puzzle;
     puzzle.initial();
-    puzzle.displayBoard();
+    puzzle.display_board();
     Vector<Move> steps;
     if (puzzle.solve(steps)) {
         cout << "The steps of solution are:" << endl;
