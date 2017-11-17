@@ -50,13 +50,15 @@ class peg_solitaire {
 
 public:
 
-    void initial() { // initialize the board
+    peg_solitaire() { // initialize the board
         //board.resize(9, 9); //the board need 4 more columns and rows for convient judgement
         remain_peg = 32;
+        //g_cost = 0;
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 9; y++) {
                 if ((abs(x - 4) < 2 && abs(y - 4) < 4) || (abs(y - 4) < 2 && abs(x - 4) < 4)){
                     board[x][y] = 'x'; // if the location is on the board but not in the center, there should be a peg
+                    //g_cost += abs(i - 4) + abs(j - 4); // calculate the initial cost by summing all the manhattan distance to the center
                 } else {  // if the location is out of the board, let it be ' '
                     board[x][y] = ' ';
                 }
@@ -117,62 +119,61 @@ public:
         if (remain_peg == 1 && board[4][4] == 'x') { // reach the goal
             return true;
         }
-        for (int x = 1; x < 9; x++) {
-            for (int y = 1; y < 9; y++) {
-                if (board[x][y] == 'o') { // find out the available jump to location
-                    if (y > 1) {
-                        //cout << remain_peg << ", 3:" << x << y << endl;
-                        if (board[x][y - 2] == 'x' && board[x][y - 1] == 'x') {
-                            //cout << 3;
-                            steps += Move(x, y - 2, x, y);
-                            Move move(x, y - 2, x, y);
-                            do_move(move); // try this moving
-                            if (solve(steps)) return true;
-                            revoke(move); // if it can not reach the goal, cancel the movement
-                            steps.remove(steps.size() - 1);
-                        }
-                    }
 
-                    if (x > 1) {
-                        //cout << remain_peg << ", 2:" << x << y << endl;
-                        if (board[x - 2][y] == 'x' && board[x - 1][y] == 'x') {
-                            //cout << 2;
-                            steps += Move(x - 2, y, x, y);
-                            Move move(x - 2, y, x, y);
-                            do_move(move); // try this moving
-                            if (solve(steps)) return true;
-                            revoke(move); // if it can not reach the goal, cancel the movement
-                            steps.remove(steps.size() - 1);
-                        }
-                    }
+        int priority = 4;
+        while (priority >= 0) {
+            for (int x = 1; x < 8; x++) {
+                for (int y = 1; y < 8; y++) {
+                    if ((abs(x - 4) + abs(y - 4)) == priority) {
+                        if (board[x][y] == 'o') { // find out the available jump to location
+                            if (y > 1) {
+                                if (board[x][y - 2] == 'x' && board[x][y - 1] == 'x') {
+                                    steps += Move(x, y - 2, x, y);
+                                    Move move(x, y - 2, x, y);
+                                    do_move(move); // try this moving
+                                    if (solve(steps)) return true;
+                                    revoke(move); // if it can not reach the goal, cancel the movement
+                                    steps.remove(steps.size() - 1);
+                                }
+                            }
 
-                    if (x < 8) {
-                        //cout << remain_peg << ", 1:" << x << y << endl;
-                        if (board[x + 2][y] == 'x' && board[x + 1][y] == 'x') {
-                            //cout << 1;
-                            steps += Move(x + 2, y, x, y);
-                            Move move(x + 2, y, x, y);
-                            do_move(move); // try this moving
-                            if (solve(steps)) return true;
-                            revoke(move); // if it can not reach the goal, cancel the movement
-                            steps.remove(steps.size() - 1);
-                        }
-                    }
+                            if (x > 1) {
+                                if (board[x - 2][y] == 'x' && board[x - 1][y] == 'x') {
+                                    steps += Move(x - 2, y, x, y);
+                                    Move move(x - 2, y, x, y);
+                                    do_move(move); // try this moving
+                                    if (solve(steps)) return true;
+                                    revoke(move); // if it can not reach the goal, cancel the movement
+                                    steps.remove(steps.size() - 1);
+                                }
+                            }
 
-                    if (y < 8) {
-                        //cout << remain_peg << ", 4:" << x << y << endl;
-                        if (board[x][y + 2] == 'x' && board[x][y + 1] == 'x') {
-                            //cout << 4;
-                            steps += Move(x, y + 2, x, y);
-                            Move move(x, y + 2, x, y);
-                            do_move(move); // try this moving
-                            if (solve(steps)) return true;
-                            revoke(move); // if it can not reach the goal, cancel the movement
-                            steps.remove(steps.size() - 1);
+                            if (x < 8) {
+                                if (board[x + 2][y] == 'x' && board[x + 1][y] == 'x') {
+                                    steps += Move(x + 2, y, x, y);
+                                    Move move(x + 2, y, x, y);
+                                    do_move(move); // try this moving
+                                    if (solve(steps)) return true;
+                                    revoke(move); // if it can not reach the goal, cancel the movement
+                                    steps.remove(steps.size() - 1);
+                                }
+                            }
+
+                            if (y < 8) {
+                                if (board[x][y + 2] == 'x' && board[x][y + 1] == 'x') {
+                                    steps += Move(x, y + 2, x, y);
+                                    Move move(x, y + 2, x, y);
+                                    do_move(move); // try this moving
+                                    if (solve(steps)) return true;
+                                    revoke(move); // if it can not reach the goal, cancel the movement
+                                    steps.remove(steps.size() - 1);
+                                }
+                            }
                         }
                     }
                 }
             }
+            priority--;
         }
         //if (remain_peg < 2) displayBoard();
         return false; // the current board has no chance to reach the goal
@@ -211,12 +212,13 @@ public:
 private:
     char board[9][9]; // storage the infomation of the board
     int remain_peg; // storage the number of pegs remained
+    //int g_cost;
+    //int f_cost[4];
 };
 
 
 int q2(){
     peg_solitaire puzzle;
-    puzzle.initial();
     puzzle.display_board();
     Vector<Move> steps;
     if (puzzle.solve(steps)) {
