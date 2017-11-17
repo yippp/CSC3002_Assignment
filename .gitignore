@@ -1,6 +1,9 @@
-
 /build-*64bit-Debug
+
+*.pro.user
 
 /empty-project
 
-*.pro.user
+*.user
+
+hw2/hw2.pro.user

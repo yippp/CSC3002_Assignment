@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include "grid.h"
 #include "vector.h"
 #include <cmath>
 
@@ -64,6 +63,10 @@ public:
             }
         }
         board[4][4] = 'o'; // the center of the board shoube be empty
+
+//        board[3][4] = 'x';
+//        board[2][4] = 'x';
+//        remain_peg = 2;
 
 //        board[2][4] = 'o'; // fixed the first step
 //        board[3][4] = 'o';
@@ -171,7 +174,7 @@ public:
                 }
             }
         }
-        if (remain_peg < 2) displayBoard();
+        //if (remain_peg < 2) displayBoard();
         return false; // the current board has no chance to reach the goal
     }
 
@@ -206,7 +209,7 @@ public:
 
 
 private:
-    Grid<char> board; // storage the infomation of the board
+    char board[10][10]; // storage the infomation of the board
     int remain_peg; // storage the number of pegs remained
 };
 
