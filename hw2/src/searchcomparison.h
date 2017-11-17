@@ -1,0 +1,6 @@
+#ifndef SEARCHCOMPPARISON_H
+#define SEARCHCOMPPARISON_H
+
+int q3();
+
+#endif // SEARCHCOMPPARISON_H
