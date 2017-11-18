@@ -73,7 +73,9 @@ HEADERS += $$PWD/lib/StanfordCPPLib/collections/*.h \
     src/q1.h \
     src/searchcomparison.h \
     src/PegSolitaire.h \
-    src/mergesort.h
+    src/mergesort.h \
+    src/mystring.h \
+    src/q5.h
 HEADERS += $$PWD/lib/StanfordCPPLib/graphics/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/io/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/private/*.h
