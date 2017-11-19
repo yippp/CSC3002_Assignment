@@ -11,9 +11,10 @@ int q5() {
     MyString str5("string5");
     MyString str6("string6");
 
-    str5 += str2;
-    str4 = str5 + str1;
     str6 = str1.substr(3,7);
+    str5 += str1;
+    str4 = str2 + str1;
+
 
     cout << "str1: " << str1 << endl;
     cout << "str1.toString(): " << str1.toString() << endl;
