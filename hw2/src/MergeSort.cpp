@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include "random.h"
-#include "mergesort.h"
+#include "MergeSort.h"
 using namespace std;
 
 const unsigned int numberOfinteger=30;

@@ -3,16 +3,21 @@
 #include "gwindow.h" // for GWindow
 #include "q1.h"
 #include "PegSolitaire.h"
-#include "searchcomparison.h"
-#include "mergesort.h"
+#include "SearchComparison.h"
+#include "MergeSort.h"
 #include "q5.h"
 using namespace std;
 
 int main() {
-    //q1();
+    cout << "Q1:" << endl;
+    q1();
+    cout << endl << "Q2:" << endl;
     q2();
-    //q3();
-    //q4();
-    //q5();
+    cout << endl << "Q3:" << endl;
+    q3();
+    cout << endl << "Q4:" << endl;
+    q4();
+    cout << endl << "Q5:" << endl;
+    q5();
     return 0;
 }

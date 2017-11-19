@@ -3,7 +3,7 @@
  * --------------------------
  * This is the answer to question 5 of assignmet 2 of CSC 3002 at CUHKSZ
  * Done by Shuqian Ye, 115010269
- * The code is tested pass in macOS using Clang, but failed in Windows using Visual Studio.
+ * The code is tested pass in macOS using Qt Creator with Clang, but failed in Windows using Visual Studio.
  */
 #ifndef __MYSTRING_H__
 #define __MYSTRING_H__
@@ -19,21 +19,28 @@ using namespace std;
             len = 0;
         }
 
+
         MyString(const char *str) {
             // create a MyString with initial content from char
             len = strlen(str);
             data = new char[len + 1];
             // create an empty MyString class with the same length of entry
 
-            strcpy(data, str);
+            for (int i = 0; i < len+1; i++) {
+                        data[i] = str[i];
+            }
         }
+
 
         MyString(const MyString &str) { // copy constructor
             len = str.len;
             data = new char[len + 1];
             // create an empty MyString class with the same length of entry
-            strcpy(data, str.data);
+            for (int i = 0; i < len+1; i++) {
+                        data[i] = str.data[i];
+            }
         }
+
 
         ~MyString(){ // destructor
             if (NULL != data) {
@@ -42,12 +49,13 @@ using namespace std;
             }
         }
 
+
         unsigned int length(){
             // returns the number of characters in the string
             return len;
         }
 
-        /*运算符重载*/
+
         MyString &operator = (const MyString &str) {
              // assignment operator to copy
 
@@ -55,11 +63,14 @@ using namespace std;
                 delete []data; // clean the current data
                 len = str.len;
                 data = new char[len + 1];
-                strcpy(data, str.data);
+                for (int i = 0; i < len + 1; i++) {
+                            data[i] = str.data[i];
+                }
             }
 
             return *this;
         }
+
 
         MyString &operator += (const MyString &str) {
             // appends a character or a string to the end
@@ -67,17 +78,23 @@ using namespace std;
             len += str.len; // extent the length
 
             data = new char[len + 1];
-            strcpy(data, tempStr);
-            strcat(data, str.data);
+            for (int i = 0; i < len - str.len; i++) {
+                        data[i] = tempStr[i];
+            }
+            for (int i = 0; i < str.len; i++) {
+                        data[len - str.len + i] = str.data[i];
+            }
             delete []tempStr;
 
             return *this;
         }
 
+
         char &operator[] (const size_t index) {
             // returns by reference the character at index position of this MyString
             return data[index];
         }
+
 
         string & toString() {
             // converts a MyString to a C++ string.
@@ -85,6 +102,7 @@ using namespace std;
             for (int i = 0; i < len; i++) str += data[i];
             return str;
         }
+
 
         MyString substr(unsigned int start, unsigned int n=1) {
             // returns a substring of the current string object from the index start woth length n
@@ -100,6 +118,7 @@ using namespace std;
             return sub;
         }
 
+
         friend MyString operator+ (const MyString &, const MyString &); // concatenate 2 MyString objects
         friend bool operator== (const MyString &, const MyString &); // relational operators
         friend bool operator!= (const MyString &, const MyString &);
@@ -114,45 +133,67 @@ using namespace std;
     };
 
 
-    MyString operator + (const MyString &s1, const MyString &s2) {
-        MyString temp;
-
-        temp.len = s1.len + s2.len;
-        temp.data = new char[temp.len + 1];
-        strcpy(temp.data, s1.data);
-        strcat(temp.data, s2.data);
-
-        return temp;
-    }
-
-    bool operator == (const MyString &s1, const MyString &s2) {
+    MyString operator+(const MyString & s1, const MyString & s2) {
         // concatenate 2 MyString objects
-        return (strcmp(s1.data, s2.data) == 0);
+        MyString s = s1;
+        s += s2;
+        return s;
     }
 
-    bool operator != (const MyString &s1, const MyString &s2) {
-        // relational operators !=
-        return (strcmp(s1.data, s2.data) != 0);
+
+    bool operator==(const MyString& s1, const MyString& s2) {
+        // relational operators ==
+        if (s1.len != s2.len) return false; //when the length are not equal, they are not equal
+        for (int i = 0; i < s1.len; i++) {
+            if (s1.data[i] != s2.data[i]) return false;
+        }
+        return true;
     }
 
-    bool operator < (const MyString &s1, const MyString &s2) {
+
+    bool operator<(const MyString& s1, const MyString& s2) {
         // relational operators <
-        return (strcmp(s1.data, s2.data) < 0);
+        int i = 0;
+
+        while ((s1.data[i] == s2.data[i]) && (i <= s1.len) && (i <= s2.len))
+            i++;
+
+        if ((s1.data[i] - s2.data[i]) < 0) { // compare which char is smaller
+            return true;
+        } else { // if all char compared are same, compare the length
+            if (s1.len < s2.len) return true;
+            else return false;
+        }
     }
 
-    bool operator <= (const MyString &s1, const MyString &s2) {
+
+    bool operator<=(const MyString& s1, const MyString& s2) {
         // relational operators <=
-        return (strcmp(s1.data, s2.data) <= 0);
+        if((s1 < s2) || (s1 == s2))
+            return true;
+        else
+            return false;
     }
 
-    bool operator > (const MyString &s1, const MyString &s2) {
+
+    bool operator>(const MyString& s1, const MyString& s2) {
         // relational operators >
-        return (strcmp(s1.data, s2.data) > 0);
+        if(s1 <= s2) return false;
+        else return true;
     }
 
-    bool operator >= (const MyString &s1, const MyString &s2) {
+
+    bool operator!=(const MyString& s1, const MyString& s2) {
+        // relational operators !=
+        if(s1 == s2) return false;
+        else return true;
+    }
+
+
+    bool operator>=(const MyString& s1, const MyString& s2) {
         // relational operators >=
-        return (strcmp(s1.data, s2.data) >= 0);
+        if(s1 < s2) return false;
+        else return true;
     }
 
     ostream &operator << (ostream &os, const MyString &str) {
