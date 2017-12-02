@@ -68,7 +68,10 @@ exists($$PWD/$$PROJECT_FILTER*.cpp) {
 exists($$PWD/lib/StanfordCPPLib/*.h) {
     HEADERS += $$PWD/lib/StanfordCPPLib/*.h
 }
-HEADERS += $$PWD/lib/StanfordCPPLib/collections/*.h
+HEADERS += $$PWD/lib/StanfordCPPLib/collections/*.h \
+    buffer.h \
+    p1.h \
+    pqueue_list.h
 HEADERS += $$PWD/lib/StanfordCPPLib/graphics/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/io/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/private/*.h
