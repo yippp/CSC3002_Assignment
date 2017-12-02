@@ -49,7 +49,8 @@ win32 {
 exists($$PWD/lib/StanfordCPPLib/*.cpp) {
     SOURCES += $$PWD/lib/StanfordCPPLib/*.cpp
 }
-SOURCES += $$PWD/lib/StanfordCPPLib/collections/*.cpp
+SOURCES += $$PWD/lib/StanfordCPPLib/collections/*.cpp \
+    p3.cpp
 SOURCES += $$PWD/lib/StanfordCPPLib/graphics/*.cpp
 SOURCES += $$PWD/lib/StanfordCPPLib/io/*.cpp
 SOURCES += $$PWD/lib/StanfordCPPLib/private/*.cpp
@@ -71,7 +72,8 @@ exists($$PWD/lib/StanfordCPPLib/*.h) {
 HEADERS += $$PWD/lib/StanfordCPPLib/collections/*.h \
     buffer.h \
     p1.h \
-    pqueue_list.h
+    pqueue_list.h \
+    pqueue_heap.h
 HEADERS += $$PWD/lib/StanfordCPPLib/graphics/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/io/*.h
 HEADERS += $$PWD/lib/StanfordCPPLib/private/*.h

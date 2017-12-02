@@ -1,14 +1,14 @@
 /*
- * File: p2.cpp
+ * File: p3.cpp
  * --------------------------
- * This is used to test the answer to question 2 of assignmet 3 of CSC 3002 at CUHKSZ
+ * This is used to test the answer to question 3 of assignmet 3 of CSC 3002 at CUHKSZ
  * Done by Shuqian Ye, 115010269
  */
 
-#include "pqueue_list.h"
+#include "pqueue_heap.h"
 using namespace std;
 
-void p2() {
+void p3() {
     PriorityQueue<string> q;
     q.enqueue("A", 5);
     q.enqueue("B", 2);
@@ -24,6 +24,8 @@ void p2() {
     cout << q.dequeue() << endl;
     cout << q.dequeue() << endl;
     cout << q.dequeue() << endl;
+
+    cout << "size:" << q.size() << endl;
 
     q.enqueue("A", 5);
     q.enqueue("E", 7);

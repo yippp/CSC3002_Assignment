@@ -1,15 +1,16 @@
 /*
  * File: pqueue_list.h
  * --------------------------
- * This is the answer to question 2 of assignmet 3 of CSC 3002 at CUHKSZ
+ * This is the answer to question 3 of assignmet 3 of CSC 3002 at CUHKSZ
  * Done by Shuqian Ye, 115010269
- * It is a class of queue wilt priority builded with linked-list
+ * It is a class of queue wilt priority builded with heap
  */
 
-#ifndef PQUEUE_LIST_H
-#define PQUEUE_LIST_H
+#ifndef PQUEUE_HEAP_H
+#define PQUEUE_HEAP_H
 
-#include "error.h"
+#include "vector.h"
+using namespace std;
 
 template <typename ValueType>
 class PriorityQueue {
@@ -38,24 +39,22 @@ public:
 
 private:
 
-/* Type for linked list cell */
+    /* Type used for each heap entry */
 
-   struct Cell {
-      ValueType data; // The data value
-      double priority; // The priority of this value
-      Cell *link; // Link to the next cell
-   };
+    struct HeapEntry {
+        ValueType value;
+        double priority;
+        long sequence;
+    };
 
-/* Instance variables */
+    /* Instance variables */
 
-   Cell *head; // Pointer to the cell at the head
-   int count;  // Number of elements in the queue
-
-/* Private method prototypes */
-
-   void deepCopy(const PriorityQueue<ValueType> & src);
-
+    Vector<HeapEntry> heap;
+    long enqueueCount;
+    int count;
+    int capacity;
 };
+
 
 /*
  * Implementation notes: PriorityQueue constructor
@@ -66,18 +65,13 @@ private:
 
 template <typename ValueType>
 PriorityQueue<ValueType>::PriorityQueue() {
-    head = nullptr;
-    count = 0;
+    clear();
 }
 
 /*
  * Implementation notes: ~PriorityQueue destructor
  * --------------------------------------
  * The destructor frees any memory that is allocated by the implementation.
- * Freeing this memory guarantees the client that the queue abstraction
- * will not "leak memory" in the process of running an application.
- * Because clear frees each element it processes, this implementation
- * of the destructor simply calls that method.
  */
 
 template <typename ValueType>
@@ -117,9 +111,9 @@ bool PriorityQueue<ValueType>::isEmpty() {
 
 template <typename ValueType>
 void PriorityQueue<ValueType>::clear() {
-    while (count > 0) {
-        dequeue();
-    }
+    count = 0;
+    enqueueCount = 0;
+    heap.clear();
 }
 
 /*
@@ -132,26 +126,42 @@ void PriorityQueue<ValueType>::clear() {
 
 template <typename ValueType>
 void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
-    Cell **current = &head;
-    while (*current != NULL && priority >= (*current)->priority) {
-       current = &(*current)->link;
+    if (count == heap.size()) {
+        heap.add(HeapEntry());
     }
 
-    Cell *cell = new Cell;
-    cell->data = value;
-    cell->priority = priority;
-    cell->link = *current;
-    *current = cell;
+    int current = count;
     count++;
- }
+    heap[current].value = value;
+    heap[current].priority = priority;
+    heap[current].sequence = enqueueCount++;
+
+    while (current > 0) { // maintain the priority of min-heap
+        int parent = (current - 1) / 2;
+        if (heap[parent].priority < heap[current].priority ||
+           (heap[parent].priority == heap[current].priority &&
+            heap[parent].sequence < heap[current].sequence)) {
+            break;
+        } // check wheather it is necessary to exchange the current entry with its parent
+
+        HeapEntry temp = heap[parent];
+        heap[parent] = heap[current];
+        heap[current] = temp;
+
+        current = parent;
+    }
+
+    for (int i = 0; i < count; i++) {
+        cout << heap[i].value;
+    }
+    cout << endl;
+}
 
 /*
  * Implementation notes: dequeue, peek
  * ----------------------------------
  * These methods must check for an empty queue and report an
- * error if there is no first element. The dequeue method
- * must also check for the case in which the queue becomes
- * empty and set the head pointer to NULL.
+ * error if there is no first element.
  */
 
 template <typename ValueType>
@@ -159,12 +169,34 @@ ValueType PriorityQueue<ValueType>::dequeue() {
     if (isEmpty()) {
         error("dequeue: Attempting to dequeue an empty queue");
     }
-    Cell *cell = head;
-    ValueType value = cell->data;
-    //double priorty = cell->priority;
-    head = cell->link;
+
+    ValueType value = heap[0].value;
+
+    heap[0] = heap[count - 1];
     count--;
-    delete cell;
+
+    int current = 0; // maintain the priority of min-heap
+    while (1) {
+        int left = 2 * current + 1;
+        int right = left + 1;
+        if (left > count) break;
+        int child;
+        if (heap[right].priority < heap[left].priority ||
+           (heap[left].priority == heap[right].priority &&
+            heap[right].sequence < heap[left].sequence)) {
+            child = right;
+        } else {
+            child = left;
+        } // find the most break priority child
+        if (!(heap[current].priority < heap[child].priority ||
+           (heap[current].priority == heap[child].priority &&
+            heap[child].sequence < heap[current].sequence))) {
+            HeapEntry temp = heap[child];
+            heap[child] = heap[current];
+            heap[current] = temp;
+        } // if the child break the priority, exchange it with parent
+        current = child;
+    }
     return value;
 }
 
@@ -173,7 +205,7 @@ ValueType PriorityQueue<ValueType>::peek() {
     if (isEmpty()) {
         error("peek: Attempting to peek at an empty queue");
     }
-    return head->data;
+    return heap[0].value;
 }
 
 /* Implementation notes: Stack constructor and destructor
@@ -182,47 +214,20 @@ ValueType PriorityQueue<ValueType>::peek() {
  */
 template <typename ValueType>
 PriorityQueue<ValueType>::PriorityQueue(const PriorityQueue<ValueType> & src) {
-   deepCopy(src);
+    heap = src.heap;
+    count = src.count;
+    enqueueCount = src.enqueueCount;
+    capacity = src.capacity;
 }
 
 template <typename ValueType>
 PriorityQueue<ValueType> & PriorityQueue<ValueType>::operator=(const PriorityQueue<ValueType> & src) {
-   if (this != &src) {
-      clear();
-      deepCopy(src);
-   }
-   return *this;
-}
-
-/*
- * Implementation notes: deepCopy
- * ------------------------------
- * This function copies the data from the src parameter into the current
- * object.  All dynamic memory is reallocated to create a "deep copy" in
- * which the current object and the source object are independent.
- * The capacity is set so that the stack has some room to expand.
- */
-
-template <typename ValueType>
-void PriorityQueue<ValueType>::deepCopy(const PriorityQueue<ValueType> & src) {
-    head = nullptr;
-    Cell *previous;
-
-    bool i = true;
-    for (Cell *cell = src.head; cell != nullptr; cell = cell->link) {
-        Cell *cp = new Cell;
-        cp->data = cell->data;
-        cp->priority = cell->priority;
-        if (i) {
-            head = cp;
-            i = false;
-        } else {
-            previous->link = cp;
-        }
-        previous = cp;
-
+    if (this != &src) {
+       heap = src.heap;
+       count = src.count;
+       enqueueCount = src.enqueueCount;
+       capacity = src.capacity;
     }
-    count = src.count;
+    return *this;
 }
-
-#endif // PQUEUE_LIST_H
+#endif // PQUEUE_HEAP_H
