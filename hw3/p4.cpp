@@ -20,7 +20,7 @@ void writeGraph(const SimpleGraph & g, ostream & out);
 void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & g);
 bool pathExistsBFS(Node *n1, Node *n2);
 bool pathExistsDFS(Node *n1, Node *n2);
-void findPaths(Node *destination, SimpleGraph & airline, Vector<Vector<Node *>> *paths, Vector<Node *> visited);
+void findPaths(Node *destination, SimpleGraph & airline, vector<vector<Node *>> *paths, vector<Node *> visited);
 
 void p4() {
     // create the graph
@@ -77,10 +77,11 @@ void p4() {
          << pathExistsBFS(DEN, PDX)<< endl;
 
     cout << endl;
-    //printAllPathsFound(HNL, PDX, airline);
-    //printAllPathsFound(LAX, DFW, airline);
-    //printAllPathsFound(DFW, LAX, airline);
+    printAllPathsFound(HNL, PDX, airline);
+    printAllPathsFound(LAX, DFW, airline);
+    printAllPathsFound(DFW, LAX, airline);
     printAllPathsFound(JFK, BOS, airline);
+    printAllPathsFound(DEN, ORD, airline);
 }
 
 /*
@@ -204,8 +205,8 @@ bool pathExistsDFS(Node *n1, Node *n2) {
 */
 
 void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
-    Vector<Vector<Node*>> paths;
-    Vector<Node *> visited;
+    vector<vector<Node*>> paths;
+    vector<Node *> visited;
     visited.push_back(n1);
     findPaths(n2, airline, &paths, visited);
 
@@ -221,7 +222,7 @@ void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
         for (int i = 0; i < count; i++) {
             cout << i+1 << ".";
             //print path
-            Vector<Node *> path = paths.get(i);
+            Vector<Node *> path = paths.at(i);
             for (int j = 0; j < path.size(); j++) {
                 cout << path.get(j)->name;
                 if (j < (path.size() - 1)) {
@@ -234,7 +235,7 @@ void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
         cout << "There is 1 path " << "from " << n1->name
              << " to " << n2->name << ":" << endl;
         //print path
-        Vector<Node *> path = paths.get(0);
+        Vector<Node *> path = paths.at(0);
         for (int j = 0; j < path.size(); j++) {
             cout << path.get(j)->name;
             if (j < (path.size() - 1)) {
@@ -245,10 +246,11 @@ void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
     }
 }
 
-void findPaths(Node *destination, SimpleGraph & airline, Vector<Vector<Node *>> *paths, Vector<Node *> visited) {
-    Node *current = visited.get(visited.size() - 1);
+void findPaths(Node *destination, SimpleGraph & airline, vector<vector<Node *>> *paths, vector<Node *> visited) {
+    Node *current = visited.at(visited.size() - 1);
     for (Arc *arc : (current->arcs)) {
-
+        Node *last = visited.at(visited.size() - 1);
+        if (last->name != current->name) visited.pop_back();
         Node *next = arc->finish;
         bool beenVisited = false;
         for (Node *visitedNode : visited) {
@@ -260,15 +262,15 @@ void findPaths(Node *destination, SimpleGraph & airline, Vector<Vector<Node *>> 
         if (!beenVisited) {
             if (next == destination) {
                 visited.push_back(destination);
-                Vector<Node *> path = visited;
-                cout << "======" << endl;
+                vector<Node *> path = visited;
+//                cout << "======" << endl;
                 paths->push_back(path);
             } else {
 
                 visited.push_back(next);
                 //test
 //                        for (int j = 0; j < visited.size(); j++) {
-//                            cout << visited.get(j)->name;
+//                            cout << visited.at(j)->name;
 //                            if (j < (visited.size() - 1)) {
 //                                cout << " -> ";
 //                            }
