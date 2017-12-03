@@ -28,9 +28,9 @@ public:
 
     void enqueue(ValueType value, double priority);
 
-    ValueType dequeue();
+    ValueType dequeue(double & priority);
 
-    ValueType peek();
+    ValueType peek(double & priority);
 
     PriorityQueue(const PriorityQueue<ValueType> & src);
 
@@ -118,7 +118,8 @@ bool PriorityQueue<ValueType>::isEmpty() {
 template <typename ValueType>
 void PriorityQueue<ValueType>::clear() {
     while (count > 0) {
-        dequeue();
+        double useless;
+        dequeue(useless);
     }
 }
 
@@ -132,19 +133,27 @@ void PriorityQueue<ValueType>::clear() {
 
 template <typename ValueType>
 void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
-    Cell **current = &head;
-    while (*current != NULL && priority >= (*current)->priority) {
-       current = &(*current)->link;
+    Cell *current = head;
+    bool toBeHead = true;
+    Cell *parent;
+    while (current != nullptr && priority >= (current)->priority) {
+        parent = current;
+        current = (current)->link;
+        toBeHead = false;
     }
 
     Cell *cell = new Cell;
     cell->data = value;
     cell->priority = priority;
-    cell->link = *current;
-    *current = cell;
+    cell->link = current;
     count++;
- }
 
+    if (toBeHead) { // when the head cell is change, modify the head pointer
+        head = cell;
+    } else {
+        parent->link = cell;
+    }
+}
 /*
  * Implementation notes: dequeue, peek
  * ----------------------------------
@@ -155,24 +164,25 @@ void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
  */
 
 template <typename ValueType>
-ValueType PriorityQueue<ValueType>::dequeue() {
+ValueType PriorityQueue<ValueType>::dequeue(double & priority) {
     if (isEmpty()) {
         error("dequeue: Attempting to dequeue an empty queue");
     }
     Cell *cell = head;
     ValueType value = cell->data;
-    //double priorty = cell->priority;
     head = cell->link;
+    priority = cell->priority;
     count--;
     delete cell;
     return value;
 }
 
 template <typename ValueType>
-ValueType PriorityQueue<ValueType>::peek() {
+ValueType PriorityQueue<ValueType>::peek(double & priority) {
     if (isEmpty()) {
         error("peek: Attempting to peek at an empty queue");
     }
+    priority = head->priority;
     return head->data;
 }
 

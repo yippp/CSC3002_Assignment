@@ -13,13 +13,13 @@
 using namespace std;
 
 template <typename ValueType>
-class PriorityQueue {
+class PriorityQueueHeap {
 
 public:
 
-    PriorityQueue();
+    PriorityQueueHeap();
 
-    ~PriorityQueue();
+    ~PriorityQueueHeap();
 
     int size();
 
@@ -29,13 +29,13 @@ public:
 
     void enqueue(ValueType value, double priority);
 
-    ValueType dequeue();
+    ValueType dequeue(double & priority);
 
-    ValueType peek();
+    ValueType peek(double & priority);
 
-    PriorityQueue(const PriorityQueue<ValueType> & src);
+    PriorityQueueHeap(const PriorityQueueHeap<ValueType> & src);
 
-    PriorityQueue<ValueType> & operator=(const PriorityQueue<ValueType> & src);
+    PriorityQueueHeap<ValueType> & operator=(const PriorityQueueHeap<ValueType> & src);
 
 private:
 
@@ -57,25 +57,25 @@ private:
 
 
 /*
- * Implementation notes: PriorityQueue constructor
+ * Implementation notes: PriorityQueueHeap constructor
  * --------------------------------------
  * The constructor must create an empty linked list and then
  * initialize the fields of the object.
  */
 
 template <typename ValueType>
-PriorityQueue<ValueType>::PriorityQueue() {
+PriorityQueueHeap<ValueType>::PriorityQueueHeap() {
     clear();
 }
 
 /*
- * Implementation notes: ~PriorityQueue destructor
+ * Implementation notes: ~PriorityQueueHeap destructor
  * --------------------------------------
  * The destructor frees any memory that is allocated by the implementation.
  */
 
 template <typename ValueType>
-PriorityQueue<ValueType>::~PriorityQueue() {
+PriorityQueueHeap<ValueType>::~PriorityQueueHeap() {
 }
 
 /*
@@ -87,7 +87,7 @@ PriorityQueue<ValueType>::~PriorityQueue() {
  */
 
 template <typename ValueType>
-int PriorityQueue<ValueType>::size() {
+int PriorityQueueHeap<ValueType>::size() {
     return count;
 }
 
@@ -99,7 +99,7 @@ int PriorityQueue<ValueType>::size() {
  */
 
 template <typename ValueType>
-bool PriorityQueue<ValueType>::isEmpty() {
+bool PriorityQueueHeap<ValueType>::isEmpty() {
     return count == 0;
 }
 
@@ -110,7 +110,7 @@ bool PriorityQueue<ValueType>::isEmpty() {
  */
 
 template <typename ValueType>
-void PriorityQueue<ValueType>::clear() {
+void PriorityQueueHeap<ValueType>::clear() {
     count = 0;
     enqueueCount = 0;
     heap.clear();
@@ -125,7 +125,7 @@ void PriorityQueue<ValueType>::clear() {
  */
 
 template <typename ValueType>
-void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
+void PriorityQueueHeap<ValueType>::enqueue(ValueType value, double priority) {
     if (count == heap.size()) {
         heap.add(HeapEntry());
     }
@@ -150,11 +150,6 @@ void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
 
         current = parent;
     }
-
-    for (int i = 0; i < count; i++) {
-        cout << heap[i].value;
-    }
-    cout << endl;
 }
 
 /*
@@ -165,13 +160,13 @@ void PriorityQueue<ValueType>::enqueue(ValueType value, double priority) {
  */
 
 template <typename ValueType>
-ValueType PriorityQueue<ValueType>::dequeue() {
+ValueType PriorityQueueHeap<ValueType>::dequeue(double & priority) {
     if (isEmpty()) {
         error("dequeue: Attempting to dequeue an empty queue");
     }
 
     ValueType value = heap[0].value;
-
+    priority = heap[0].priority;
     heap[0] = heap[count - 1];
     count--;
 
@@ -201,10 +196,11 @@ ValueType PriorityQueue<ValueType>::dequeue() {
 }
 
 template <typename ValueType>
-ValueType PriorityQueue<ValueType>::peek() {
+ValueType PriorityQueueHeap<ValueType>::peek(double & priority) {
     if (isEmpty()) {
         error("peek: Attempting to peek at an empty queue");
     }
+    priority = heap[0].priority;
     return heap[0].value;
 }
 
@@ -213,7 +209,7 @@ ValueType PriorityQueue<ValueType>::peek() {
  * These methods are used to deep copy a priority queue from src.
  */
 template <typename ValueType>
-PriorityQueue<ValueType>::PriorityQueue(const PriorityQueue<ValueType> & src) {
+PriorityQueueHeap<ValueType>::PriorityQueueHeap(const PriorityQueueHeap<ValueType> & src) {
     heap = src.heap;
     count = src.count;
     enqueueCount = src.enqueueCount;
@@ -221,7 +217,7 @@ PriorityQueue<ValueType>::PriorityQueue(const PriorityQueue<ValueType> & src) {
 }
 
 template <typename ValueType>
-PriorityQueue<ValueType> & PriorityQueue<ValueType>::operator=(const PriorityQueue<ValueType> & src) {
+PriorityQueueHeap<ValueType> & PriorityQueueHeap<ValueType>::operator=(const PriorityQueueHeap<ValueType> & src) {
     if (this != &src) {
        heap = src.heap;
        count = src.count;
