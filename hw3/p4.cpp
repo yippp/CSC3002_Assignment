@@ -7,8 +7,6 @@
 
 #include "graphtypes.h"
 #include "error.h"
-#include "queue.h"
-#include "stack.h"
 
 using namespace std;
 
@@ -17,10 +15,9 @@ void initiateGraph(SimpleGraph & g);
 Node *addNode(SimpleGraph & g, string name);
 Arc *addArc(SimpleGraph & g, Node *n1, Node *n2, double cost);
 void writeGraph(const SimpleGraph & g, ostream & out);
-void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & g);
-bool pathExistsBFS(Node *n1, Node *n2);
-bool pathExistsDFS(Node *n1, Node *n2);
-void findPaths(Node *destination, SimpleGraph & airline, vector<vector<Node *>> *paths, vector<Node *> visited);
+void printAllPathsFound(Node *n1, Node *n2);
+void pathExistsDFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
+void pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
 
 void p4() {
     // create the graph
@@ -65,23 +62,43 @@ void p4() {
     addArc(airline, SFO, PDX, 550);
     addArc(airline, SEA, PDX, 130);
 
+    cout << "The graph:" << endl;
     writeGraph(airline, cout);
 
-    cout << endl << "path exists from Honolulu to Portland using Deep-first search: "
-         << pathExistsDFS(HNL, PDX)<< endl;
-    cout << "path exists from Honolulu to Portland using Breadth-first search: "
-         << pathExistsBFS(HNL, PDX)<< endl;
-    cout << "path exists from Denver to Portland using Deep-first search: "
-         << pathExistsDFS(DEN, PDX)<< endl;
-    cout << "path exists from Denver to Portland using Breadth-first search: "
-         << pathExistsBFS(DEN, PDX)<< endl;
-
+    // get input of airports
     cout << endl;
-    printAllPathsFound(HNL, PDX, airline);
-    printAllPathsFound(LAX, DFW, airline);
-    printAllPathsFound(DFW, LAX, airline);
-    printAllPathsFound(JFK, BOS, airline);
-    printAllPathsFound(DEN, ORD, airline);
+    cout << "The departure airport: ";
+    string departure;
+    getline(cin, departure);
+    cout << endl << "The destination airport: ";
+    string destination;
+    getline(cin, destination);
+    cout << endl;
+
+    // find the node with the matched name and find path
+    Node *n1;
+    Node *n2;
+    bool found = false;
+    for (Node *node : airline.nodes) {
+        if (node->name == departure) {
+            n1 = node;
+            found = true;
+            break;
+        }
+    }
+    if (!found) error("Cannot find the matched departure airport");
+
+    found = false;
+    for (Node *node : airline.nodes) {
+        if (node->name == destination) {
+            n2 = node;
+            found = true;
+            break;
+        }
+    }
+    if (!found) error("Cannot find the matched departure airport");
+
+    printAllPathsFound(n1, n2);
 }
 
 /*
@@ -150,75 +167,28 @@ void writeGraph(const SimpleGraph & g, ostream & out) {
 }
 
 /*
-* Function: pathExistsBFS
-* Usage: pathExistsBFS(Node *n1, Node *n2);
-* ------------------------------
-* Find all path from n1 to n2 using Breadth-First search
-*/
-
-bool pathExistsBFS(Node *n1, Node *n2) {
-    Set<Node *> visited;
-    Queue<Node *> queue;
-    queue.enqueue(n1);
-    while (!queue.isEmpty()) {
-       Node *node = queue.dequeue();
-       if (node == n2) return true;
-       if (!visited.contains(node)) {
-          visited.add(node);
-          for (Arc *arc : node->arcs) {
-             queue.enqueue(arc->finish);
-          }
-       }
-    }
-    return false;
-}
-
-/*
-* Function: pathExistsDFS
-* Usage: pathExistsDFS(Node *n1, Node *n2);
-* ------------------------------
-* Find all path from n1 to n2 using Deap-First search
-*/
-
-bool pathExistsDFS(Node *n1, Node *n2) {
-    Set<Node *> visited;
-    Stack<Node *> stack;
-    stack.push(n1);
-    while (!stack.isEmpty()) {
-        Node *current = stack.pop();
-        if (current == n2) return true;
-        if (!visited.contains(current)) {
-            visited.add(current);
-            for (Arc *arc : current->arcs) {
-                stack.push(arc->finish);
-            }
-        }
-    }
-    return false;
-}
-
-/*
 * Function: printAllPathsFound
 * Usage: printAllPathsFound(Node *n1, Node *n2);
 * ------------------------------
 * Print all paths found from n1 to n2
 */
 
-void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
+void printAllPathsFound(Node *n1, Node *n2) {
+    //DFS
     vector<vector<Node*>> paths;
     vector<Node *> visited;
     visited.push_back(n1);
-    findPaths(n2, airline, &paths, visited);
+    pathExistsDFS(n2, &paths, visited);
 
     // print result
     int count = paths.size();
     if (count == 0) {
         cout << "There is no paths from " << n1->name
-             << " to " << n2->name << "!" << endl;
+             << " to " << n2->name << " finding by using Deep-first Search!" << endl;
     } else if (count > 1) {
-        cout << "There is " << count << " paths "
+        cout << "There are " << count << " paths "
              << "from " << n1->name
-             << " to " << n2->name << ":" << endl;
+             << " to " << n2->name << " finding by using Deep-first Search:" << endl;
         for (int i = 0; i < count; i++) {
             cout << i+1 << ".";
             //print path
@@ -233,7 +203,50 @@ void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
         }
     } else {
         cout << "There is 1 path " << "from " << n1->name
-             << " to " << n2->name << ":" << endl;
+             << " to " << n2->name << " finding by using Deep-first Search:" << endl;
+        //print path
+        Vector<Node *> path = paths.at(0);
+        for (int j = 0; j < path.size(); j++) {
+            cout << path.get(j)->name;
+            if (j < (path.size() - 1)) {
+                cout << " -> ";
+            }
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+
+    //BFS
+    paths.clear();
+    visited.clear();
+    visited.push_back(n1);
+    pathExistsBFS(n2, &paths, visited);
+
+    // print result
+    count = paths.size();
+    if (count == 0) {
+        cout << "There is no paths from " << n1->name
+             << " to " << n2->name << " finding by using Breadth-first Search!" << endl;
+    } else if (count > 1) {
+        cout << "There are " << count << " paths "
+             << "from " << n1->name
+             << " to " << n2->name << " finding by using Breadth-first Search:" << endl;
+        for (int i = 0; i < count; i++) {
+            cout << i+1 << ".";
+            //print path
+            Vector<Node *> path = paths.at(i);
+            for (int j = 0; j < path.size(); j++) {
+                cout << path.get(j)->name;
+                if (j < (path.size() - 1)) {
+                    cout << " -> ";
+                }
+            }
+            cout << endl;
+        }
+    } else {
+        cout << "There is 1 path " << "from " << n1->name
+             << " to " << n2->name << " finding by using Breadth-first Search:" << endl;
         //print path
         Vector<Node *> path = paths.at(0);
         for (int j = 0; j < path.size(); j++) {
@@ -246,10 +259,21 @@ void printAllPathsFound(Node *n1, Node *n2, SimpleGraph & airline) {
     }
 }
 
-void findPaths(Node *destination, SimpleGraph & airline, vector<vector<Node *>> *paths, vector<Node *> visited) {
+/*
+* Function: pathExistsBFS
+* Usage: pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
+* -----------------------------------------------------------------------------------------------
+* Find all paths from the first node in visited to destination using Breadth-First search
+*/
+
+void pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited) {
     Node *current = visited.at(visited.size() - 1);
+    vector<vector<Node *>> branches;
+    int branch = -1;
     for (Arc *arc : (current->arcs)) {
         Node *last = visited.at(visited.size() - 1);
+
+        // check whea the node is visited
         if (last->name != current->name) visited.pop_back();
         Node *next = arc->finish;
         bool beenVisited = false;
@@ -259,25 +283,59 @@ void findPaths(Node *destination, SimpleGraph & airline, vector<vector<Node *>> 
                 continue;
             }
         }
+
         if (!beenVisited) {
             if (next == destination) {
                 visited.push_back(destination);
                 vector<Node *> path = visited;
-//                cout << "======" << endl;
                 paths->push_back(path);
             } else {
+                branch++;
+                branches.push_back(visited);
+                branches.at(branch).push_back(next);
+            }
+        } // if the next node is not visted, continue finding path
+    }
 
+    if (branch > -1) {
+        for (int i = 0; i <= branch; i++) {
+            pathExistsBFS(destination, paths, branches.at(i));
+        }
+    }
+}
+
+
+/*
+* Function: pathExistsDFS
+* Usage: pathExistsDFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
+* -----------------------------------------------------------------------------------------------
+* Find all paths from the first node in visited to destination using Deap-First search
+*/
+
+void pathExistsDFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited) {
+    Node *current = visited.at(visited.size() - 1);
+    for (Arc *arc : (current->arcs)) {
+        Node *last = visited.at(visited.size() - 1);
+
+        // check whea the node is visited
+        if (last->name != current->name) visited.pop_back();
+        Node *next = arc->finish;
+        bool beenVisited = false;
+        for (Node *visitedNode : visited) {
+            if (visitedNode == next) {
+                beenVisited = true;
+                continue;
+            }
+        }
+
+        if (!beenVisited) {
+            if (next == destination) {
+                visited.push_back(destination);
+                vector<Node *> path = visited;
+                paths->push_back(path);
+            } else {
                 visited.push_back(next);
-                //test
-//                        for (int j = 0; j < visited.size(); j++) {
-//                            cout << visited.at(j)->name;
-//                            if (j < (visited.size() - 1)) {
-//                                cout << " -> ";
-//                            }
-//                        }
-//                        cout << endl;
-
-                findPaths(destination, airline, paths, visited);
+                pathExistsDFS(destination, paths, visited);
 
             }
         } // if the next node is not visted, continue finding path

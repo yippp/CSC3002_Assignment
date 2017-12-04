@@ -1,9 +1,7 @@
 /*
  * File: employee.h
  * ----------------
- * This file provides a skeletal interface for an Employee class with three
- * subclasses: HourlyEmployee, CommissionedEmployee, and SalariedEmployee.
- * Lines marked with  comments are excluded from the abbreviated listing.
+ * This file include the the classes need in problem 5
  */
 
 #ifndef _EMPLOYEE_H

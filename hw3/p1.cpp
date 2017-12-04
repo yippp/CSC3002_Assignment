@@ -23,6 +23,7 @@ void p1() {
     EditorBuffer buffer;
     while (true) {
         string cmd = getLine("*");
+        if (cmd == "Q" || cmd == "Q") break;
         if (cmd != "") executeCommand(buffer, cmd);
     }
 }
@@ -48,7 +49,8 @@ void executeCommand(EditorBuffer & buffer, string line) {
         case 'J': buffer.moveCursorToStart(); displayBuffer(buffer); break;
         case 'E': buffer.moveCursorToEnd(); displayBuffer(buffer); break;
         case 'H': printHelpText(); break;
-        case 'Q': exit(0);
+        // comment the next line due to the programm is needed to run for remaining questions
+        //case 'Q': exit(0);
 
         case 'C': {
             int count = 0;

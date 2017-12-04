@@ -11,10 +11,19 @@
 #include "p5.cpp";
 
 int main() {
-    //p1();
-    //p2();
-    //p3();
+    cout << "===== Question 1 =====" << endl;
+    p1();
+
+    cout << endl << "===== Question 2 =====" << endl;
+    p2();
+
+    cout << endl << "===== Question 3 =====" << endl;
+    p3();
+
+    cout << endl << "===== Question 4 =====" << endl;
     p4();
-    //p5();
+
+    cout << endl << "===== Question 5 =====" << endl;
+    p5();
     return 0;
 }
