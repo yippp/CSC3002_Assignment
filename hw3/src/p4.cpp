@@ -7,6 +7,7 @@
 
 #include "graphtypes.h"
 #include "error.h"
+#include "queue.h"
 
 using namespace std;
 
@@ -17,7 +18,7 @@ Arc *addArc(SimpleGraph & g, Node *n1, Node *n2, double cost);
 void writeGraph(const SimpleGraph & g, ostream & out);
 void printAllPathsFound(Node *n1, Node *n2);
 void pathExistsDFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
-void pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
+vector<vector<Node *>> pathExistsBFS(Node *n1, Node *n2);
 
 void p4() {
     // create the graph
@@ -97,7 +98,6 @@ void p4() {
         }
     }
     if (!found) error("Cannot find the matched departure airport");
-
     printAllPathsFound(n1, n2);
 }
 
@@ -219,9 +219,7 @@ void printAllPathsFound(Node *n1, Node *n2) {
 
     //BFS
     paths.clear();
-    visited.clear();
-    visited.push_back(n1);
-    pathExistsBFS(n2, &paths, visited);
+    paths = pathExistsBFS(n1, n2);
 
     // print result
     count = paths.size();
@@ -261,49 +259,70 @@ void printAllPathsFound(Node *n1, Node *n2) {
 
 /*
 * Function: pathExistsBFS
-* Usage: pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
+* Usage: vector<vector<Node *>> pathExistsBFS(Node *n1, Node *n2);
 * -----------------------------------------------------------------------------------------------
 * Find all paths from the first node in visited to destination using Breadth-First search
 */
 
-void pathExistsBFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited) {
-    Node *current = visited.at(visited.size() - 1);
-    vector<vector<Node *>> branches;
-    int branch = -1;
-    for (Arc *arc : (current->arcs)) {
-        Node *last = visited.at(visited.size() - 1);
+vector<vector<Node *>> pathExistsBFS(Node *n1, Node *n2) {
+    vector<vector<Node *>> paths;
+    vector<Node *> begin;
+    begin.push_back(n1);
+    paths.push_back(begin);
+    bool finished = false;
+    Node* lastNode;
+    int possible; // count the possible next node
+    int indexOrigin; // the index of the original path
+    bool pass;
+    vector<bool> deleted;
+    deleted.push_back(false); // mark the path deleted or not
+    int loopTimes;
+    bool pushDelete; //used to push_bkack into deleted
 
-        // check whea the node is visited
-        if (last->name != current->name) visited.pop_back();
-        Node *next = arc->finish;
-        bool beenVisited = false;
-        for (Node *visitedNode : visited) {
-            if (visitedNode == next) {
-                beenVisited = true;
-                continue;
+    while (!finished) {
+        finished = true;
+        loopTimes = paths.size();
+        for (int i = 0; i < loopTimes; i++) {
+            if (!deleted.at(i)) {
+                for (int j = 0; j < paths.size(); j++) {
+                    if (!deleted.at(j)) {
+                        indexOrigin = j;
+                        deleted.at(indexOrigin) = true; // delete the origin path
+                        break;
+                    }
+                }
+                lastNode = paths.at(indexOrigin).back();
+                possible = lastNode->arcs.size();
+                for (Arc *arc : lastNode->arcs) {
+                    //count++;
+                    pass = false;
+                    for (Node *visited : paths.at(indexOrigin)) { // search all possible nodes
+                        if (visited == arc->finish) { // if the node should be added has been in the path
+                            pass = true;
+                            break;
+                        }
+                    }
+                    if (!pass) {
+                        paths.push_back(paths.at(indexOrigin)); // copy the origin path
+                        paths.back().push_back(arc->finish); // add the new node
+                        pushDelete = false;
+                        deleted.push_back(pushDelete);
+                        finished = false;
+                    }
+                }
+
             }
         }
-
-        if (!beenVisited) {
-            if (next == destination) {
-                visited.push_back(destination);
-                vector<Node *> path = visited;
-                paths->push_back(path);
-            } else {
-                branch++;
-                branches.push_back(visited);
-                branches.at(branch).push_back(next);
-            }
-        } // if the next node is not visted, continue finding path
     }
 
-    if (branch > -1) {
-        for (int i = 0; i <= branch; i++) {
-            pathExistsBFS(destination, paths, branches.at(i));
+    vector<vector<Node *>> successPaths; // filter out the successful paths
+    for (vector<Node *> successPath : paths) {
+        if (successPath.back() == n2){
+            successPaths.push_back(successPath);
         }
     }
+    return successPaths;
 }
-
 
 /*
 * Function: pathExistsDFS
