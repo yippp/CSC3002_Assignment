@@ -19,6 +19,13 @@ void executeCommand(EditorBuffer & buffer, string line);
 void displayBuffer(EditorBuffer & buffer);
 void printHelpText();
 
+/*
+* Function: q1
+* Usage: q1();
+* ------------------------
+* Test the code for question 1.
+*/
+
 void p1() {
     EditorBuffer buffer;
     while (true) {
@@ -27,6 +34,7 @@ void p1() {
         if (cmd != "") executeCommand(buffer, cmd);
     }
 }
+
 /*
  * Function: executeCommand
  * Usage: executeCommand(buffer, line);
@@ -63,6 +71,7 @@ void executeCommand(EditorBuffer & buffer, string line) {
             displayBuffer(buffer);
             break;
         }
+//      // commtented due to better run with other questions code together
 //        {
 //            stringstream ss(line[1]);
 //            int num;

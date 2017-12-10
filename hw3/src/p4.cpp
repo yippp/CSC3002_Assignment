@@ -20,6 +20,15 @@ void printAllPathsFound(Node *n1, Node *n2);
 void pathExistsDFS(Node *destination, vector<vector<Node *>> *paths, vector<Node *> visited);
 vector<vector<Node *>> pathExistsBFS(Node *n1, Node *n2);
 
+/*
+* Function: p4
+* Usage: p4();
+* ------------------------
+* Main question of question 4.
+* Create the airline graph, and output.
+* Find path from the input.
+*/
+
 void p4() {
     // create the graph
     SimpleGraph airline;
@@ -220,6 +229,11 @@ void printAllPathsFound(Node *n1, Node *n2) {
     //BFS
     paths.clear();
     paths = pathExistsBFS(n1, n2);
+    if (paths.size() == 1) {
+        if (paths.at(0).size() == 1) {
+            paths.clear();
+        }
+    }
 
     // print result
     count = paths.size();

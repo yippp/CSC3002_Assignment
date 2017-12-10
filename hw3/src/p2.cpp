@@ -8,6 +8,13 @@
 #include "pqueue_list.h"
 using namespace std;
 
+/*
+* Function: q2
+* Usage: q2();
+* ------------------------
+* Test the code for question 2.
+*/
+
 void p2() {
     cout << "PriorityQueue<string> q;" << endl;
     PriorityQueue<string> q;
@@ -26,6 +33,7 @@ void p2() {
     cout << "isempty:" << q.isEmpty() << endl;
 
     double priority;
+    cout << "q.dequeue" << endl;
     cout << q.dequeue(priority) << priority << endl;
     cout << q.dequeue(priority) << priority << endl;
     cout << q.dequeue(priority) << priority << endl;

@@ -1,3 +1,10 @@
+/*
+ * File: main.cpp
+ * --------------------------
+ * This is the main function to run questions of assignmet 3 of CSC 3002 at CUHKSZ
+ * Done by Shuqian Ye, 115010269
+ */
+
 #include <iostream>
 #include "console.h"
 #include "gwindow.h" // for GWindow
@@ -25,5 +32,6 @@ int main() {
 
     cout << endl << "===== Question 5 =====" << endl;
     p5();
+
     return 0;
 }

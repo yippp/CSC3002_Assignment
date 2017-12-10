@@ -8,6 +8,13 @@
 #include "pqueue_heap.h"
 using namespace std;
 
+/*
+* Function: q3
+* Usage: q3();
+* ------------------------
+* Test the code for question 3.
+*/
+
 void p3() {
     cout << "PriorityQueueHeap<string> q;" << endl;
     PriorityQueueHeap<string> q;
@@ -26,6 +33,7 @@ void p3() {
     cout << "isempty:" << q.isEmpty() << endl;
 
     double priority;
+    cout << "q.dequeue" << endl;
     cout << q.dequeue(priority) << priority << endl;
     cout << q.dequeue(priority) << priority << endl;
     cout << q.dequeue(priority) << priority << endl;

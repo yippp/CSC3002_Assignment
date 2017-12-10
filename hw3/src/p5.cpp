@@ -12,6 +12,13 @@
 
 using namespace std;
 
+/*
+* Function: q5
+* Usage: q5();
+* ------------------------
+* Test the code for question 5.
+*/
+
 void p5() {
    HourlyEmployee cratchit("Bob Cratchit");
    cratchit.setHourlyRate(1.00);
